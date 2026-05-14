@@ -29,6 +29,9 @@ foreach ($allPasswords as $pwd) {
     if (strlen($decrypted) < 8) $weakCount++;
 }
 
+// Calculate security score
+$securityScore = $totalPasswords > 0 ? round((($totalPasswords - $weakCount) / $totalPasswords) * 100) : 100;
+
 // Get user profile picture for dropdown
 $stmt = $pdo->prepare("SELECT profile_picture, full_name FROM admins WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
@@ -38,813 +41,702 @@ $fullName = $userData['full_name'];
 $displayName = !empty($fullName) ? $fullName : $_SESSION['username'];
 $userInitials = strtoupper(substr($displayName, 0, 2));
 
-// Check if profile picture exists
 $profilePicturePath = '';
 if (!empty($profilePicture) && file_exists('uploads/profile/' . $profilePicture)) {
     $profilePicturePath = 'uploads/profile/' . $profilePicture;
 }
+
+// Category metadata
+$catMeta = [
+    'Work'     => ['fas fa-briefcase',        '#3B82F6'],
+    'Personal' => ['fas fa-user',              '#8B5CF6'],
+    'Finance'  => ['fas fa-chart-line',        '#10B981'],
+    'Social'   => ['fas fa-hashtag',           '#F59E0B'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Dashboard - <?php echo APP_NAME; ?></title>
+    <title>Dashboard — <?php echo APP_NAME; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --sidebar-w: 260px;
+            --accent: #10B981;
+            --accent-dark: #059669;
+            --accent-light: #D1FAE5;
+            --navy: #0F172A;
+            --navy-mid: #1E293B;
+            --slate: #64748B;
+            --border: #E2E8F0;
+            --surface: #F8FAFC;
+            --white: #ffffff;
+            --text: #0F172A;
+            --text-muted: #64748B;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --warn: #F59E0B;
+            --radius: 14px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08);
         }
-        
-        body {
-            background: #F8FAFC;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-        
-        /* ========== SIDEBAR STYLES ========== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background: var(--surface); font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); overflow-x:hidden; }
+
+        /* ═══════════════════════════════════════
+           SIDEBAR — identical to vault.php
+        ═══════════════════════════════════════ */
         .sidebar {
-            width: 280px;
-            background: #0F172A;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease-in-out;
-            overflow-y: auto;
+            position: fixed; top:0; left:0; height:100vh; width:var(--sidebar-w);
+            background: var(--navy); display:flex; flex-direction:column;
+            z-index: 1000; transition: transform .3s cubic-bezier(.4,0,.2,1);
+            box-shadow: 4px 0 24px rgba(0,0,0,.15);
         }
-        
-        /* Hide sidebar on mobile by default */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            }
-        }
-        
-        /* Desktop - sidebar always visible */
-        @media (min-width: 769px) {
-            .sidebar {
-                transform: translateX(0) !important;
-            }
-        }
-        
-        .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        
-        .sidebar-header h3 {
-            color: #10B981;
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin: 0;
-        }
-        
-        .sidebar-header p {
-            color: #64748B;
-            font-size: 0.75rem;
-            margin: 0;
-        }
-        
-        .sidebar-menu {
-            padding: 1.5rem 0;
-        }
-        
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 0.875rem 1.5rem;
-            color: #94A3B8;
-            text-decoration: none;
-            gap: 12px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .sidebar-menu a i {
-            width: 20px;
-            font-size: 1.1rem;
-        }
-        
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            background: rgba(16,185,129,0.08);
-            color: #10B981;
-            border-left: 3px solid #10B981;
-        }
-        
-        .sidebar-menu hr {
-            margin: 1rem 1.5rem;
-            border-color: rgba(255,255,255,0.08);
-        }
-        
-        /* Sidebar scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-        
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #10B981;
-            border-radius: 4px;
-        }
-        
-        /* ========== MAIN CONTENT ========== */
-        .main-content {
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-        
-        /* Desktop - content shifts right */
-        @media (min-width: 769px) {
-            .main-content {
-                margin-left: 280px;
-            }
-        }
-        
-        /* Mobile - no margin, just padding */
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-                padding-top: 80px;
-            }
-        }
-        
-        /* ========== MOBILE MENU BUTTON ========== */
-        .mobile-menu-btn {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 1100;
-            width: 44px;
-            height: 44px;
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-        }
-        
-        .mobile-menu-btn:hover {
-            background: #F1F5F9;
-        }
-        
-        .mobile-menu-btn:active {
-            transform: scale(0.95);
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-        }
-        
-        /* Overlay for mobile */
         .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+            z-index:999; backdrop-filter:blur(2px);
         }
-        
-        .sidebar-overlay.active {
-            display: block;
+        .sidebar-logo {
+            padding: 1.5rem 1.25rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            display:flex; align-items:center; gap:10px;
         }
-        
-        /* ========== TOP NAV ========== */
-        .top-nav {
-            background: white;
-            border-radius: 16px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        .logo-icon {
+            width:38px; height:38px; background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+            border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
         }
-        
-        @media (max-width: 768px) {
-            .top-nav {
-                padding: 0.75rem 1rem;
-                margin-bottom: 1rem;
-            }
+        .logo-icon i { color:#fff; font-size:1rem; }
+        .logo-text h3 { color:#fff; font-size:1.05rem; font-weight:800; letter-spacing:-.3px; line-height:1.1; }
+        .logo-text span { color:var(--slate); font-size:.7rem; font-weight:500; }
+
+        .sidebar-nav { flex:1; overflow-y:auto; padding:.75rem 0; }
+        .sidebar-nav::-webkit-scrollbar { width:0; }
+        .nav-section-label {
+            padding:.5rem 1.25rem .25rem;
+            color:rgba(255,255,255,.25); font-size:.65rem; font-weight:700;
+            letter-spacing:1px; text-transform:uppercase;
         }
-        
-        .page-title h1 {
-            color: #0F172A;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
+        .nav-item {
+            display:flex; align-items:center; gap:10px;
+            padding:.7rem 1.25rem; margin:.1rem .75rem; border-radius:10px;
+            color:rgba(255,255,255,.55); text-decoration:none;
+            font-size:.84rem; font-weight:500; transition:all .2s;
         }
-        
-        .page-title p {
-            color: #64748B;
-            font-size: 0.85rem;
-            margin: 0;
+        .nav-item i { width:18px; font-size:.9rem; text-align:center; flex-shrink:0; }
+        .nav-item:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.9); }
+        .nav-item.active {
+            background:rgba(16,185,129,.12); color:var(--accent);
+            box-shadow: inset 3px 0 0 var(--accent); margin-left:.75rem;
         }
-        
-        @media (max-width: 768px) {
-            .page-title h1 {
-                font-size: 1.2rem;
-            }
-            .page-title p {
-                font-size: 0.7rem;
-            }
+        .sidebar-divider { border-color:rgba(255,255,255,.07); margin:.5rem 1rem; }
+        .sidebar-footer {
+            padding:1rem 1.25rem; border-top:1px solid rgba(255,255,255,.07);
         }
-        
-        /* ========== ADMIN DROPDOWN ========== */
-        .admin-dropdown {
-            position: relative;
+        .sidebar-user { display:flex; align-items:center; gap:10px; }
+        .user-avatar-sidebar {
+            width:34px; height:34px; background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:.8rem; font-weight:700; flex-shrink:0; overflow:hidden;
         }
-        
+        .user-avatar-sidebar img { width:100%; height:100%; object-fit:cover; }
+        .user-info p { color:rgba(255,255,255,.85); font-size:.78rem; font-weight:600; }
+        .user-info span { color:var(--slate); font-size:.68rem; }
+
+        /* ═══════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════ */
+        .main-wrap {
+            margin-left: var(--sidebar-w); min-height:100vh; padding:1.5rem;
+            transition: margin-left .3s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* ═══════════════════════════════════════
+           TOP BAR — identical pattern to vault.php
+        ═══════════════════════════════════════ */
+        .topbar {
+            background:var(--white); border-radius:var(--radius); padding:.9rem 1.25rem;
+            margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center;
+            border:1px solid var(--border); box-shadow:var(--shadow-sm);
+        }
+        .topbar-left { display:flex; align-items:center; gap:.75rem; }
+        .mobile-menu-btn {
+            display:none; background:none; border:1px solid var(--border);
+            border-radius:9px; padding:.4rem .55rem; cursor:pointer; color:var(--slate);
+            font-size:1rem; transition:all .2s;
+        }
+        .mobile-menu-btn:hover { background:var(--surface); color:var(--text); }
+        .page-title h1 { font-size:1.3rem; font-weight:800; color:var(--text); letter-spacing:-.3px; }
+        .page-title p { font-size:.75rem; color:var(--text-muted); margin-top:1px; }
+
+        /* ═══════════════════════════════════════
+           PROFILE DROPDOWN
+        ═══════════════════════════════════════ */
+        .admin-dropdown { position:relative; z-index:2000; }
         .admin-trigger {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 12px 5px 8px;
-            background: transparent;
-            border-radius: 40px;
-            transition: background 0.2s;
-            cursor: pointer;
+            display:flex; align-items:center; gap:9px; padding:5px 12px 5px 6px;
+            background:var(--surface); border-radius:40px; cursor:pointer;
+            border:1px solid var(--border); transition:all .2s;
         }
-        
-        .admin-trigger:hover {
-            background: #F1F5F9;
+        .admin-trigger:hover { background:#F1F5F9; border-color:var(--accent); }
+        .trigger-avatar {
+            width:34px; height:34px; border-radius:50%; overflow:hidden;
+            background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:.82rem; font-weight:700; flex-shrink:0;
         }
-        
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #10B981, #059669);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 0.9rem;
+        .trigger-avatar img { width:100%; height:100%; object-fit:cover; }
+        .trigger-name { font-size:.82rem; font-weight:600; color:var(--text); }
+        .trigger-chevron { font-size:.65rem; color:var(--slate); transition:transform .2s; }
+        .admin-dropdown.active .trigger-chevron { transform:rotate(180deg); }
+
+        .dropdown-panel {
+            position:absolute; top:calc(100% + 8px); right:0; width:270px;
+            background:var(--white); border-radius:16px; border:1px solid var(--border);
+            box-shadow:0 20px 40px -10px rgba(0,0,0,.18);
+            opacity:0; visibility:hidden; transform:translateY(-6px);
+            transition:all .2s ease; z-index:9999;
         }
-        
-        .user-avatar-img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
+        .admin-dropdown.active .dropdown-panel { opacity:1; visibility:visible; transform:translateY(0); }
+
+        .dp-header {
+            padding:14px 16px; background:var(--surface);
+            border-radius:16px 16px 0 0; border-bottom:1px solid var(--border);
         }
-        
-        .admin-name-small {
-            font-weight: 600;
-            color: #0F172A;
-            font-size: 0.85rem;
+        .dp-user {
+            display:flex; align-items:center; gap:11px; padding:7px 8px;
+            border-radius:10px; cursor:pointer; transition:background .15s;
         }
-        
-        @media (max-width: 480px) {
-            .admin-name-small {
-                display: none;
-            }
+        .dp-user:hover { background:var(--white); }
+        .dp-avatar {
+            width:44px; height:44px; border-radius:50%; overflow:hidden;
+            background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:1.1rem; font-weight:700; flex-shrink:0;
         }
-        
-        /* Dropdown Menu */
-        .fb-dropdown-menu {
-            position: absolute;
-            top: 50px;
-            right: 0;
-            width: 280px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: all 0.2s ease;
-            z-index: 1000;
+        .dp-avatar img { width:100%; height:100%; object-fit:cover; }
+        .dp-name { font-size:.92rem; font-weight:700; color:var(--text); }
+        .dp-handle { font-size:.68rem; color:var(--text-muted); }
+        .dp-divider { height:1px; background:var(--border); }
+        .dp-item {
+            display:flex; align-items:center; gap:11px; padding:11px 16px;
+            color:var(--text); text-decoration:none; font-size:.82rem; font-weight:500;
+            transition:background .15s;
         }
-        
-        .admin-dropdown.active .fb-dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .fb-dropdown-header {
-            padding: 16px;
-            border-bottom: 1px solid #E2E8F0;
-        }
-        
-        .fb-user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px;
-            border-radius: 12px;
-            transition: background 0.2s;
-            cursor: pointer;
-        }
-        
-        .fb-user-info:hover {
-            background: #F1F5F9;
-        }
-        
-        .fb-user-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #10B981, #059669);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        
-        .fb-user-avatar-img {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .fb-user-details h4 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #0F172A;
-            margin: 0;
-        }
-        
-        .fb-user-details p {
-            font-size: 0.75rem;
-            color: #64748B;
-            margin: 0;
-        }
-        
-        .fb-divider {
-            height: 1px;
-            background: #E2E8F0;
-            margin: 8px 0;
-        }
-        
-        .fb-dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #0F172A;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        
-        .fb-dropdown-item:hover {
-            background: #F1F5F9;
-        }
-        
-        .fb-dropdown-item i {
-            width: 24px;
-            font-size: 1.1rem;
-            color: #10B981;
-        }
-        
-        .fb-dropdown-item.logout-item i {
-            color: #EF4444;
-        }
-        
-        .fb-dropdown-item.logout-item span {
-            color: #EF4444;
-        }
-        
-        /* ========== STAT CARDS ========== */
+        .dp-item:hover { background:var(--surface); }
+        .dp-item i { width:22px; font-size:.9rem; color:var(--accent); text-align:center; }
+        .dp-item.dp-logout i { color:var(--danger); }
+        .dp-item.dp-logout span { color:var(--danger); }
+        .dp-item:last-child { border-radius:0 0 16px 16px; }
+
+        /* ═══════════════════════════════════════
+           STAT CARDS — vault.php card aesthetic
+        ═══════════════════════════════════════ */
         .stat-card {
-            background: white;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #E2E8F0;
-            transition: all 0.3s;
+            background:var(--white); border:1px solid var(--border); border-radius:16px;
+            padding:1.25rem; position:relative; overflow:hidden;
+            transition:all .25s cubic-bezier(.4,0,.2,1); cursor:default;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        .stat-card::after {
+            content:''; position:absolute; inset:0; border-radius:16px;
+            box-shadow:0 0 0 1.5px var(--accent); opacity:0; transition:opacity .2s;
         }
-        
-        .stat-icon {
-            font-size: 2rem;
-            color: #10B981;
-            margin-bottom: 1rem;
+        .stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.09); }
+        .stat-card:hover::after { opacity:1; }
+        /* colored left accent bar */
+        .stat-card .accent-bar {
+            position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:16px 0 0 16px;
         }
-        
+        .stat-icon-wrap {
+            width:46px; height:46px; border-radius:13px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.3rem; margin-bottom:.9rem;
+        }
         .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0F172A;
-            margin-bottom: 0.25rem;
+            font-size:1.9rem; font-weight:800; color:var(--text);
+            letter-spacing:-.04em; line-height:1;
         }
-        
-        .stat-label {
-            color: #64748B;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        
-        /* ========== SECTION CARDS ========== */
+        .stat-label { font-size:.75rem; font-weight:600; color:var(--text-muted); margin-top:.3rem; }
+        .stat-sub { font-size:.68rem; color:var(--slate); margin-top:.15rem; }
+
+        /* ═══════════════════════════════════════
+           SECTION CARDS — same vault-card style
+        ═══════════════════════════════════════ */
         .section-card {
-            background: white;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #E2E8F0;
+            background:var(--white); border-radius:var(--radius);
+            border:1px solid var(--border); box-shadow:var(--shadow-sm);
+            margin-bottom:1.25rem; overflow:hidden;
         }
-        
         .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #F1F5F9;
+            padding:.85rem 1.25rem; background:var(--surface);
+            border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
         }
-        
         .section-header h4 {
-            color: #0F172A;
-            font-weight: 700;
-            margin: 0;
-            font-size: 1.1rem;
+            font-size:.9rem; font-weight:700; color:var(--text); margin:0;
+            display:flex; align-items:center; gap:7px;
         }
-        
-        /* ========== TABLE STYLES ========== */
-        .table-custom {
-            width: 100%;
-        }
-        
+        .section-header h4 i { color:var(--accent); font-size:.95rem; }
+        .section-body { padding:1.25rem; }
+
+        /* ═══════════════════════════════════════
+           TABLE
+        ═══════════════════════════════════════ */
+        .table-custom { width:100%; border-collapse:collapse; }
         .table-custom th {
-            color: #64748B;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 1rem 0.5rem;
-            border-bottom: 2px solid #F1F5F9;
+            color:var(--slate); font-weight:700; font-size:.65rem;
+            text-transform:uppercase; letter-spacing:.6px;
+            padding:.6rem .75rem; border-bottom:2px solid var(--border); white-space:nowrap;
         }
-        
         .table-custom td {
-            padding: 1rem 0.5rem;
-            color: #334155;
-            border-bottom: 1px solid #F1F5F9;
+            padding:.65rem .75rem; color:var(--text); font-size:.82rem;
+            border-bottom:1px solid var(--border);
         }
-        
-        .badge-category {
-            background: #F1F5F9;
-            color: #0F172A;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        .table-custom tr:last-child td { border-bottom:none; }
+        .clickable-row { cursor:pointer; transition:background .15s; }
+        .clickable-row:hover { background:var(--surface); }
+
+        /* site icon in table */
+        .tbl-icon {
+            width:30px; height:30px; border-radius:9px;
+            display:inline-flex; align-items:center; justify-content:center;
+            font-size:.9rem; margin-right:8px; vertical-align:middle; flex-shrink:0;
         }
-        
-        .clickable-row {
-            cursor: pointer;
-            transition: background 0.2s;
+        .tbl-name { display:flex; align-items:center; }
+        .tbl-name strong { font-weight:700; font-size:.83rem; }
+
+        /* category badge — same chip style */
+        .cat-chip {
+            display:inline-flex; align-items:center; gap:4px;
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:20px; padding:3px 10px; font-size:.62rem; font-weight:700; color:var(--text);
         }
-        
-        .clickable-row:hover {
-            background: #F8FAFC;
+        .cat-chip i { font-size:.58rem; }
+
+        /* strength tag */
+        .strength-tag { font-size:.6rem; font-weight:700; padding:2px 9px; border-radius:20px; display:inline-flex; align-items:center; gap:3px; }
+
+        /* ═══════════════════════════════════════
+           CATEGORY GRID
+        ═══════════════════════════════════════ */
+        .cat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; }
+        .cat-item {
+            background:var(--surface); border-radius:12px; padding:.8rem 1rem;
+            border:1px solid var(--border); display:flex; justify-content:space-between;
+            align-items:center; transition:all .2s;
         }
-        
-        .btn-primary {
-            background: #10B981;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
+        .cat-item:hover { border-color:var(--accent); transform:translateY(-2px); }
+        .cat-item-left { display:flex; align-items:center; gap:9px; }
+        .cat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .cat-name { font-size:.8rem; font-weight:600; color:var(--text); }
+        .cat-badge {
+            background:var(--white); border:1px solid var(--border);
+            padding:2px 10px; border-radius:20px; font-size:.68rem; font-weight:700; color:var(--accent);
         }
-        
-        .btn-primary:hover {
-            background: #059669;
-            transform: translateY(-2px);
+
+        /* security score bar */
+        .score-bar-wrap { margin-top:.5rem; }
+        .score-bar-track { background:#E2E8F0; border-radius:20px; height:6px; overflow:hidden; }
+        .score-bar-fill { height:100%; border-radius:20px; transition:width .8s ease; }
+
+        /* view all link button */
+        .btn-view-all {
+            background:var(--accent); color:#fff; border:none; border-radius:10px;
+            padding:.4rem 1rem; font-size:.75rem; font-weight:700;
+            display:inline-flex; align-items:center; gap:.35rem; cursor:pointer;
+            text-decoration:none; transition:all .2s;
         }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.8rem;
+        .btn-view-all:hover { background:var(--accent-dark); color:#fff; transform:translateY(-1px); box-shadow:0 4px 12px rgba(16,185,129,.3); }
+
+        /* count pill */
+        .count-pill {
+            background:var(--surface); border:1px solid var(--border); border-radius:20px;
+            padding:3px 12px; font-size:.72rem; font-weight:600; color:var(--slate);
+            display:inline-flex; align-items:center; gap:5px;
         }
-        
-        /* ========== RESPONSIVE GRID ========== */
-        @media (max-width: 768px) {
-            .stat-number {
-                font-size: 1.5rem;
-            }
-            
-            .stat-icon {
-                font-size: 1.5rem;
-            }
-            
-            .table-custom th,
-            .table-custom td {
-                padding: 0.75rem 0.25rem;
-                font-size: 0.75rem;
-            }
-            
-            .section-header h4 {
-                font-size: 0.9rem;
-            }
-            
-            .category-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.75rem;
-            }
+        .count-pill i { color:var(--accent); }
+
+        /* empty state */
+        .empty-state { text-align:center; padding:2.5rem 1rem; }
+        .empty-state i { font-size:2.5rem; color:#CBD5E1; margin-bottom:.85rem; }
+        .empty-state h4 { color:var(--slate); font-weight:700; font-size:.95rem; margin-bottom:.35rem; }
+        .empty-state p { color:var(--text-muted); font-size:.8rem; }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════ */
+        @media (max-width:1200px) { .cat-grid { grid-template-columns:repeat(2,1fr); } }
+
+        @media (max-width:768px) {
+            .sidebar { transform:translateX(-100%); }
+            .sidebar.open { transform:translateX(0); }
+            .sidebar-overlay.open { display:block; }
+            .main-wrap { margin-left:0; padding:1rem; }
+            .mobile-menu-btn { display:flex; align-items:center; }
+            .cat-grid { grid-template-columns:1fr 1fr; }
+            .topbar { padding:.75rem 1rem; }
+            .page-title h1 { font-size:1.1rem; }
+            .trigger-name { display:none; }
         }
-        
-        @media (max-width: 480px) {
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-number {
-                font-size: 1.2rem;
-            }
-            
-            .category-grid {
-                grid-template-columns: 1fr;
-            }
+
+        @media (max-width:480px) {
+            .cat-grid { grid-template-columns:1fr; }
+            .table-custom th:nth-child(4),
+            .table-custom td:nth-child(4) { display:none; }
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Menu Button -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="fas fa-bars" style="font-size: 1.2rem; color: #0F172A;"></i>
-    </button>
-    
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3><i class="fas fa-shield-alt"></i> PM System</h3>
-            <p>Enterprise Password Management</p>
-        </div>
-        <div class="sidebar-menu">
-            <a href="dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="vault.php"><i class="fas fa-lock"></i> Password Vault</a>
-            <a href="settings.php"><i class="fas fa-cog"></i> Settings</a>
-            <a href="logs.php"><i class="fas fa-history"></i> Activity Logs</a>
-            <hr>
-            <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+
+<!-- Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+            <h3>PM System</h3>
+            <span>Enterprise Password Manager</span>
         </div>
     </div>
-    
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <div class="top-nav">
-            <div class="page-title">
-                <h1>Dashboard</h1>
-                <p>Overview of your secure password vault</p>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="dashboard.php" class="nav-item active">
+            <i class="fas fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="vault.php" class="nav-item">
+            <i class="fas fa-lock"></i> Password Vault
+        </a>
+
+        <div class="nav-section-label" style="margin-top:.5rem;">Manage</div>
+        <a href="settings.php" class="nav-item">
+            <i class="fas fa-gear"></i> Settings
+        </a>
+        <a href="logs.php" class="nav-item">
+            <i class="fas fa-clock-rotate-left"></i> Activity Logs
+        </a>
+
+        <hr class="sidebar-divider">
+
+        <a href="logout.php" class="nav-item" style="color:rgba(239,68,68,.7);">
+            <i class="fas fa-right-from-bracket"></i> Logout
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="user-avatar-sidebar">
+                <?php if ($profilePicturePath): ?>
+                    <img src="<?php echo $profilePicturePath; ?>?v=<?php echo time(); ?>" alt="Profile">
+                <?php else: ?>
+                    <?php echo $userInitials; ?>
+                <?php endif; ?>
             </div>
-            
-            <!-- Admin Dropdown -->
-            <div class="admin-dropdown" id="adminDropdown">
-                <div class="admin-trigger" onclick="toggleDropdown(event)">
+            <div class="user-info">
+                <p><?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?></p>
+                <span>Vault Manager</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-wrap" id="mainWrap">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h1><i class="fas fa-gauge-high" style="color:var(--accent);margin-right:8px;font-size:1.1rem;"></i>Dashboard</h1>
+                <p>Welcome back, <?php echo sanitizeOutput($displayName); ?> 👋</p>
+            </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="admin-dropdown" id="adminDropdown">
+            <div class="admin-trigger" onclick="toggleDropdown(event)">
+                <div class="trigger-avatar">
                     <?php if ($profilePicturePath): ?>
-                        <img src="<?php echo $profilePicturePath; ?>?v=<?php echo time(); ?>" class="user-avatar-img" alt="Profile">
+                        <img src="<?php echo $profilePicturePath; ?>?v=<?php echo time(); ?>" alt="Profile">
                     <?php else: ?>
-                        <div class="user-avatar">
-                            <?php echo $userInitials; ?>
-                        </div>
+                        <?php echo $userInitials; ?>
                     <?php endif; ?>
-                    <span class="admin-name-small"><?php echo sanitizeOutput($_SESSION['username']); ?></span>
                 </div>
-                
-                <div class="fb-dropdown-menu">
-                    <div class="fb-dropdown-header">
-                        <div class="fb-user-info" onclick="window.location.href='settings.php?tab=account'">
+                <span class="trigger-name"><?php echo sanitizeOutput($displayName); ?></span>
+                <i class="fas fa-chevron-down trigger-chevron"></i>
+            </div>
+
+            <div class="dropdown-panel">
+                <div class="dp-header">
+                    <div class="dp-user" onclick="window.location.href='settings.php?tab=account'">
+                        <div class="dp-avatar">
                             <?php if ($profilePicturePath): ?>
-                                <img src="<?php echo $profilePicturePath; ?>?v=<?php echo time(); ?>" class="fb-user-avatar-img" alt="Profile">
+                                <img src="<?php echo $profilePicturePath; ?>?v=<?php echo time(); ?>" alt="Profile">
                             <?php else: ?>
-                                <div class="fb-user-avatar">
-                                    <?php echo $userInitials; ?>
-                                </div>
+                                <?php echo $userInitials; ?>
                             <?php endif; ?>
-                            <div class="fb-user-details">
-                                <h4><?php echo sanitizeOutput($displayName); ?></h4>
-                                <p>@<?php echo sanitizeOutput($_SESSION['username']); ?></p>
-                            </div>
+                        </div>
+                        <div>
+                            <div class="dp-name"><?php echo sanitizeOutput($displayName); ?></div>
+                            <div class="dp-handle">@<?php echo sanitizeOutput($_SESSION['username']); ?></div>
                         </div>
                     </div>
-                    
-                    <div class="fb-divider"></div>
-                    
-                    <a href="settings.php?tab=account" class="fb-dropdown-item">
-                        <i class="fas fa-user-circle"></i>
-                        <span>Account Settings</span>
-                    </a>
-                    
-                    <a href="logout.php" class="fb-dropdown-item logout-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Log Out</span>
-                    </a>
+                </div>
+                <div class="dp-divider"></div>
+                <a href="settings.php?tab=account" class="dp-item">
+                    <i class="fas fa-user-circle"></i><span>Account Settings</span>
+                </a>
+                <a href="logout.php" class="dp-item dp-logout">
+                    <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ STAT CARDS ═══ -->
+    <div class="row g-3 mb-3">
+        <!-- Total Credentials -->
+        <div class="col-md-4 col-sm-6">
+            <div class="stat-card">
+                <div class="accent-bar" style="background:#10B981;"></div>
+                <div class="stat-icon-wrap" style="background:rgba(16,185,129,.1);">
+                    <i class="fas fa-key" style="color:var(--accent);"></i>
+                </div>
+                <div class="stat-number"><?php echo $totalPasswords; ?></div>
+                <div class="stat-label">Total Credentials</div>
+                <div class="stat-sub"><?php echo count($categories); ?> categor<?php echo count($categories)===1?'y':'ies'; ?></div>
+            </div>
+        </div>
+
+        <!-- Security Score -->
+        <div class="col-md-4 col-sm-6">
+            <?php
+            $scoreColor = $securityScore >= 80 ? '#10B981' : ($securityScore >= 50 ? '#F59E0B' : '#EF4444');
+            $scoreLabel = $securityScore >= 80 ? 'Excellent' : ($securityScore >= 50 ? 'Moderate' : 'Needs Work');
+            ?>
+            <div class="stat-card">
+                <div class="accent-bar" style="background:<?php echo $scoreColor; ?>;"></div>
+                <div class="stat-icon-wrap" style="background:<?php echo $scoreColor; ?>1A;">
+                    <i class="fas fa-shield-halved" style="color:<?php echo $scoreColor; ?>;"></i>
+                </div>
+                <div class="stat-number" style="color:<?php echo $scoreColor; ?>;"><?php echo $securityScore; ?>%</div>
+                <div class="stat-label">Security Score</div>
+                <div class="score-bar-wrap">
+                    <div class="score-bar-track">
+                        <div class="score-bar-fill" style="width:<?php echo $securityScore; ?>%;background:<?php echo $scoreColor; ?>;"></div>
+                    </div>
+                </div>
+                <div class="stat-sub" style="margin-top:.4rem;"><?php echo $scoreLabel; ?><?php if($weakCount>0): ?> · <?php echo $weakCount; ?> weak<?php endif; ?></div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="col-md-4 col-sm-12">
+            <div class="stat-card">
+                <div class="accent-bar" style="background:#8B5CF6;"></div>
+                <div class="stat-icon-wrap" style="background:rgba(139,92,246,.1);">
+                    <i class="fas fa-folder-open" style="color:#8B5CF6;"></i>
+                </div>
+                <div class="stat-number"><?php echo count($categories); ?></div>
+                <div class="stat-label">Active Categories</div>
+                <div class="stat-sub">
+                    <?php
+                    $catNames = array_column($categories, 'category');
+                    echo count($catNames) ? implode(', ', array_slice($catNames, 0, 3)) : 'None yet';
+                    ?>
                 </div>
             </div>
         </div>
-        
-        <!-- Stats Row -->
-        <div class="row">
-            <div class="col-md-4 col-sm-6 col-12">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-database"></i></div>
-                    <div class="stat-number"><?php echo $totalPasswords; ?></div>
-                    <div class="stat-label">Total Credentials</div>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-6 col-12">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-number"><?php echo $weakCount; ?></div>
-                    <div class="stat-label">Weak Passwords</div>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-12 col-12">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-folder"></i></div>
-                    <div class="stat-number"><?php echo count($categories); ?></div>
-                    <div class="stat-label">Categories</div>
-                </div>
+    </div>
+
+    <!-- ═══ RECENT CREDENTIALS ═══ -->
+    <div class="section-card">
+        <div class="section-header">
+            <h4><i class="fas fa-clock-rotate-left"></i> Recently Added Credentials</h4>
+            <div class="d-flex align-items-center gap-2">
+                <?php if($totalPasswords > 5): ?>
+                <div class="count-pill"><i class="fas fa-database"></i><?php echo $totalPasswords; ?> total</div>
+                <?php endif; ?>
+                <a href="vault.php" class="btn-view-all">View All <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
-        
-        <!-- Recent Entries -->
-        <div class="section-card">
-            <div class="section-header">
-                <h4><i class="fas fa-clock"></i> Recently Added Credentials</h4>
-                <a href="vault.php" class="btn btn-primary btn-sm">View All <i class="fas fa-arrow-right"></i></a>
-            </div>
-            
+        <div class="section-body p-0">
             <?php if(count($recentPasswords) > 0): ?>
             <div class="table-responsive">
                 <table class="table-custom">
                     <thead>
-                        <tr><th>Name</th><th>Username</th><th>Category</th><th>Created</th></tr>
+                        <tr>
+                            <th>Site / App</th>
+                            <th>Username</th>
+                            <th>Category</th>
+                            <th>Added</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($recentPasswords as $item): ?>
+                        <?php foreach($recentPasswords as $item):
+                            // Get brand icon + color
+                            $lower = strtolower(trim($item['name']));
+                            $iconMap = [
+                                'facebook'=>['fab fa-facebook','#1877F2'],
+                                'instagram'=>['fab fa-instagram','#E1306C'],
+                                'twitter'=>['fab fa-x-twitter','#000000'],
+                                'tiktok'=>['fab fa-tiktok','#010101'],
+                                'linkedin'=>['fab fa-linkedin','#0A66C2'],
+                                'youtube'=>['fab fa-youtube','#FF0000'],
+                                'whatsapp'=>['fab fa-whatsapp','#25D366'],
+                                'discord'=>['fab fa-discord','#5865F2'],
+                                'telegram'=>['fab fa-telegram','#26A5E4'],
+                                'gmail'=>['fab fa-google','#EA4335'],
+                                'google'=>['fab fa-google','#4285F4'],
+                                'github'=>['fab fa-github','#24292F'],
+                                'slack'=>['fab fa-slack','#4A154B'],
+                                'trello'=>['fab fa-trello','#0052CC'],
+                                'gcash'=>['fas fa-mobile-screen-button','#007DFF'],
+                                'maya'=>['fas fa-mobile-screen-button','#2ECAD5'],
+                                'paypal'=>['fab fa-paypal','#003087'],
+                                'bdo'=>['fas fa-university','#003087'],
+                                'bpi'=>['fas fa-landmark','#003087'],
+                                'metrobank'=>['fas fa-university','#003087'],
+                                'microsoft'=>['fab fa-microsoft','#0078D4'],
+                                'teams'=>['fab fa-microsoft','#6264A7'],
+                                'outlook'=>['fab fa-microsoft','#0078D4'],
+                                'dropbox'=>['fab fa-dropbox','#0061FF'],
+                                'figma'=>['fab fa-figma','#F24E1E'],
+                                'shopify'=>['fab fa-shopify','#96BF48'],
+                                'wordpress'=>['fab fa-wordpress','#21759B'],
+                                'apple'=>['fab fa-apple','#555555'],
+                                'icloud'=>['fab fa-apple','#3F8AE0'],
+                                'steam'=>['fab fa-steam','#1B2838'],
+                                'playstation'=>['fab fa-playstation','#003087'],
+                                'reddit'=>['fab fa-reddit','#FF4500'],
+                                'twitch'=>['fab fa-twitch','#9146FF'],
+                                'viber'=>['fab fa-viber','#7360F2'],
+                                'messenger'=>['fab fa-facebook-messenger','#0084FF'],
+                                'snapchat'=>['fab fa-snapchat','#FFFC00'],
+                                'binance'=>['fab fa-bitcoin','#F0B90B'],
+                                'coins'=>['fas fa-coins','#F7B731'],
+                                'pinterest'=>['fab fa-pinterest','#E60023'],
+                            ];
+                            $ic = ['fas fa-key','#64748B'];
+                            foreach($iconMap as $k=>$v) { if(strpos($lower,$k)!==false){$ic=$v;break;} }
+                            [$iClass,$iColor] = $ic;
+                            $isBg = $iColor . '18';
+
+                            $cm = ['Work'=>['fas fa-briefcase','#3B82F6'],'Personal'=>['fas fa-user','#8B5CF6'],'Finance'=>['fas fa-chart-line','#10B981'],'Social'=>['fas fa-hashtag','#F59E0B']];
+                            [$cIcon,$cColor] = $cm[$item['category']] ?? ['fas fa-folder','#64748B'];
+                        ?>
                         <tr class="clickable-row" onclick="window.location.href='vault.php'">
-                            <td><strong><?php echo sanitizeOutput($item['name']); ?></strong></td>
-                            <td><?php echo sanitizeOutput($item['username']); ?></td>
-                            <td><span class="badge-category"><?php echo sanitizeOutput($item['category'] ?? 'Uncategorized'); ?></span></td>
-                            <td><?php echo date('M d, Y', strtotime($item['created_at'])); ?></td>
+                            <td>
+                                <div class="tbl-name">
+                                    <div class="tbl-icon" style="background:<?php echo $isBg; ?>;">
+                                        <i class="<?php echo $iClass; ?>" style="color:<?php echo $iColor; ?>;"></i>
+                                    </div>
+                                    <strong><?php echo sanitizeOutput($item['name']); ?></strong>
+                                </div>
+                            </td>
+                            <td style="color:var(--slate);"><?php echo sanitizeOutput($item['username']); ?></td>
+                            <td>
+                                <div class="cat-chip">
+                                    <i class="<?php echo $cIcon; ?>" style="color:<?php echo $cColor; ?>;"></i>
+                                    <?php echo sanitizeOutput($item['category'] ?? 'Uncategorized'); ?>
+                                </div>
+                            </td>
+                            <td style="color:var(--slate);white-space:nowrap;"><?php echo date('M d, Y', strtotime($item['created_at'])); ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-             
-             <?php if($totalPasswords > 5): ?>
-             <div class="text-center mt-3">
-                 <small class="text-muted">
-                     <i class="fas fa-info-circle"></i> Showing last 5 entries. 
-                     <a href="vault.php">View all <?php echo $totalPasswords; ?> credentials</a>
-                 </small>
-             </div>
-             <?php endif; ?>
-             
+            <?php if($totalPasswords > 5): ?>
+            <div style="padding:.65rem 1.25rem; border-top:1px solid var(--border); background:var(--surface);">
+                <p style="font-size:.72rem; color:var(--slate); margin:0; display:flex; align-items:center; gap:5px;">
+                    <i class="fas fa-circle-info" style="color:var(--accent);"></i>
+                    Showing last 5 of <?php echo $totalPasswords; ?> credentials
+                </p>
+            </div>
+            <?php endif; ?>
             <?php else: ?>
-            <div class="text-center py-4 text-muted">
-                <i class="fas fa-lock" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-                No passwords added yet. Click "Add New Credential" in the Vault page to get started.
+            <div class="empty-state">
+                <i class="fas fa-vault"></i>
+                <h4>No credentials yet</h4>
+                <p>Head to the <a href="vault.php" style="color:var(--accent);font-weight:600;">Password Vault</a> to add your first one.</p>
             </div>
             <?php endif; ?>
         </div>
-        
-        <!-- Category Distribution -->
-        <?php if(!empty($categories)): ?>
-        <div class="section-card">
-            <div class="section-header">
-                <h4><i class="fas fa-chart-pie"></i> Category Distribution</h4>
-            </div>
-            <div class="category-grid">
-                <?php foreach($categories as $cat): ?>
-                <div class="d-flex justify-content-between align-items-center p-2" style="background: #F8FAFC; border-radius: 12px;">
-                    <span><i class="fas fa-tag"></i> <?php echo sanitizeOutput($cat['category'] ?: 'Uncategorized'); ?></span>
-                    <span class="badge-category"><?php echo $cat['count']; ?> items</span>
+    </div>
+
+    <!-- ═══ CATEGORY DISTRIBUTION ═══ -->
+    <?php if(!empty($categories)): ?>
+    <div class="section-card">
+        <div class="section-header">
+            <h4><i class="fas fa-chart-pie"></i> Category Distribution</h4>
+            <div class="count-pill"><i class="fas fa-layer-group"></i> <?php echo count($categories); ?> groups</div>
+        </div>
+        <div class="section-body">
+            <div class="cat-grid">
+                <?php foreach($categories as $cat):
+                    $cm2 = ['Work'=>['fas fa-briefcase','#3B82F6'],'Personal'=>['fas fa-user','#8B5CF6'],'Finance'=>['fas fa-chart-line','#10B981'],'Social'=>['fas fa-hashtag','#F59E0B']];
+                    [$cIcon2,$cColor2] = $cm2[$cat['category']] ?? ['fas fa-folder','#64748B'];
+                ?>
+                <div class="cat-item">
+                    <div class="cat-item-left">
+                        <div class="cat-dot" style="background:<?php echo $cColor2; ?>;"></div>
+                        <div>
+                            <div class="cat-name">
+                                <i class="<?php echo $cIcon2; ?>" style="color:<?php echo $cColor2; ?>;margin-right:5px;font-size:.8rem;"></i>
+                                <?php echo sanitizeOutput($cat['category'] ?: 'Uncategorized'); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cat-badge"><?php echo $cat['count']; ?></div>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
     </div>
-    
-    <script>
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const mainContent = document.getElementById('mainContent');
-        
-        function openSidebar() {
-            sidebar.classList.add('open');
-            sidebarOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        function toggleSidebar() {
-            if (sidebar.classList.contains('open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
-        }
-        
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', toggleSidebar);
-        }
-        
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', closeSidebar);
-        }
-        
-        // Close sidebar on window resize if screen becomes desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 769) {
-                closeSidebar();
-            }
-        });
-        
-        // Close sidebar when clicking a link on mobile
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    closeSidebar();
-                }
-            });
-        });
-        
-        // Admin Dropdown Toggle
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('adminDropdown');
-            dropdown.classList.toggle('active');
-        }
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('adminDropdown');
-            if (dropdown && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('active');
-            }
-        });
-        
-        // Prevent dropdown close on inner click
-        document.querySelector('.fb-dropdown-menu')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // Change menu button icon when sidebar is open
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === 'class') {
-                    const btnIcon = mobileMenuBtn?.querySelector('i');
-                    if (btnIcon) {
-                        if (sidebar.classList.contains('open')) {
-                            btnIcon.className = 'fas fa-times';
-                        } else {
-                            btnIcon.className = 'fas fa-bars';
-                        }
-                    }
-                }
-            });
-        });
-        
-        if (sidebar) {
-            observer.observe(sidebar, { attributes: true });
-        }
-    </script>
+    <?php endif; ?>
+
+</div><!-- /main-wrap -->
+
+<script>
+/* ── SIDEBAR ── */
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// Swipe-left to close
+let _tx = 0;
+document.getElementById('sidebar').addEventListener('touchstart', e=>{ _tx=e.changedTouches[0].screenX; },{passive:true});
+document.getElementById('sidebar').addEventListener('touchend', e=>{
+    if (_tx - e.changedTouches[0].screenX > 60) closeSidebar();
+},{passive:true});
+
+window.addEventListener('resize', ()=>{
+    if (window.innerWidth >= 769) closeSidebar();
+});
+
+/* ── PROFILE DROPDOWN ── */
+function toggleDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('adminDropdown').classList.toggle('active');
+}
+document.addEventListener('click', ()=>{ document.getElementById('adminDropdown').classList.remove('active'); });
+document.querySelector('.dropdown-panel').addEventListener('click', e=>e.stopPropagation());
+</script>
 </body>
 </html>
