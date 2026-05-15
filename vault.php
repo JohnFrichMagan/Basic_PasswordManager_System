@@ -165,7 +165,6 @@ $sitesByCategory = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault — <?php echo APP_NAME; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6.5 with brands kit -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -192,9 +191,6 @@ $sitesByCategory = [
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background: var(--surface); font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); }
 
-        /* ═══════════════════════════════════════
-           SIDEBAR
-        ═══════════════════════════════════════ */
         .sidebar {
             position: fixed; top:0; left:0; height:100vh; width:var(--sidebar-w);
             background: var(--navy); display:flex; flex-direction:column;
@@ -260,18 +256,12 @@ $sitesByCategory = [
         .user-info p { color:rgba(255,255,255,.85); font-size:.78rem; font-weight:600; }
         .user-info span { color:var(--slate); font-size:.68rem; }
 
-        /* ═══════════════════════════════════════
-           LAYOUT
-        ═══════════════════════════════════════ */
         .main-wrap {
             margin-left: var(--sidebar-w);
             min-height: 100vh; padding:1.5rem;
             transition: margin-left .3s cubic-bezier(.4,0,.2,1);
         }
 
-        /* ═══════════════════════════════════════
-           TOP BAR
-        ═══════════════════════════════════════ */
         .topbar {
             background:var(--white); border-radius:var(--radius); padding:.9rem 1.25rem;
             margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center;
@@ -294,9 +284,6 @@ $sitesByCategory = [
         }
         .btn-add:hover { background:var(--accent-dark); transform:translateY(-1px); box-shadow:0 4px 12px rgba(16,185,129,.3); }
 
-        /* ═══════════════════════════════════════
-           FILTER BAR
-        ═══════════════════════════════════════ */
         .filter-bar {
             background:var(--white); border-radius:var(--radius); padding:1rem 1.25rem;
             margin-bottom:1.25rem; border:1px solid var(--border); box-shadow:var(--shadow-sm);
@@ -315,9 +302,6 @@ $sitesByCategory = [
         }
         .count-pill i { color:var(--accent); }
 
-        /* ═══════════════════════════════════════
-           VAULT CONTAINER
-        ═══════════════════════════════════════ */
         .vault-card {
             background:var(--white); border-radius:var(--radius);
             border:1px solid var(--border); box-shadow:var(--shadow-sm); overflow:hidden;
@@ -336,31 +320,28 @@ $sitesByCategory = [
         .vault-scroll::-webkit-scrollbar-track { background:transparent; }
         .vault-scroll::-webkit-scrollbar-thumb { background:var(--accent); border-radius:10px; }
 
-        /* ═══════════════════════════════════════
-           CREDENTIAL GRID & CARDS
-        ═══════════════════════════════════════ */
         .cred-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
 
         .cred-card {
             background:var(--white); border:1px solid var(--border); border-radius:16px;
-            padding:1.1rem; transition:all .25s cubic-bezier(.4,0,.2,1); cursor:pointer;
+            padding:1.1rem; transition:all .25s cubic-bezier(.4,0,.2,1);
             position:relative; overflow:hidden;
+            cursor: pointer;
         }
         .cred-card::after {
             content:''; position:absolute; inset:0; border-radius:16px;
             box-shadow: 0 0 0 1.5px var(--accent); opacity:0; transition:opacity .2s;
+            pointer-events: none;
         }
         .cred-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.09); }
         .cred-card:hover::after { opacity:1; }
 
-        /* colored left accent bar */
         .cred-card .accent-bar {
             position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:16px 0 0 16px;
         }
 
         .card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem; }
 
-        /* Brand icon circle */
         .brand-icon {
             width:46px; height:46px; border-radius:13px;
             display:flex; align-items:center; justify-content:center;
@@ -401,6 +382,8 @@ $sitesByCategory = [
         }
         .act-copy { background:rgba(16,185,129,.1); color:var(--accent); border:1px solid rgba(16,185,129,.15); }
         .act-copy:hover { background:var(--accent); color:#fff; }
+        .act-view { background:rgba(99,102,241,.1); color:#6366F1; border:1px solid rgba(99,102,241,.15); }
+        .act-view:hover { background:#6366F1; color:#fff; }
         .act-show { background:var(--surface); color:var(--slate); border:1px solid var(--border); }
         .act-show:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
         .act-edit { background:rgba(59,130,246,.1); color:var(--info); border:1px solid rgba(59,130,246,.15); }
@@ -408,17 +391,11 @@ $sitesByCategory = [
         .act-del { background:rgba(239,68,68,.1); color:var(--danger); border:1px solid rgba(239,68,68,.15); }
         .act-del:hover { background:var(--danger); color:#fff; }
 
-        /* ═══════════════════════════════════════
-           EMPTY STATE
-        ═══════════════════════════════════════ */
         .empty-state { grid-column:1/-1; text-align:center; padding:3.5rem 1rem; }
         .empty-icon { font-size:3rem; color:#CBD5E1; margin-bottom:1rem; }
         .empty-state h4 { color:var(--slate); font-weight:700; margin-bottom:.5rem; }
         .empty-state p { color:var(--text-muted); font-size:.85rem; }
 
-        /* ═══════════════════════════════════════
-           MODAL
-        ═══════════════════════════════════════ */
         .modal-content { border-radius:20px; border:none; overflow:hidden; }
         .modal-header { background:var(--navy); color:#fff; padding:1.1rem 1.5rem; border:none; }
         .modal-header .modal-title { font-weight:800; font-size:1.05rem; letter-spacing:-.2px; }
@@ -426,7 +403,6 @@ $sitesByCategory = [
         .modal-body { padding:1.5rem; background:var(--surface); }
         .modal-footer { padding:.9rem 1.5rem; background:var(--white); border-top:1px solid var(--border); }
 
-        /* Category picker */
         .cat-picker { display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; margin-bottom:1.2rem; }
         .cat-opt {
             padding:.75rem .5rem; border-radius:12px; border:1.5px solid var(--border);
@@ -439,7 +415,6 @@ $sitesByCategory = [
         .cat-opt.selected { background:var(--accent); border-color:var(--accent); color:#fff; }
         .cat-opt.selected i { color:#fff; }
 
-        /* Site picker */
         .site-picker {
             max-height:260px; overflow-y:auto; border:1px solid var(--border);
             border-radius:12px; padding:.4rem; background:var(--white);
@@ -455,7 +430,6 @@ $sitesByCategory = [
         .site-opt.selected .site-opt-icon { color:#fff; }
         .site-opt-icon { width:22px; font-size:1rem; text-align:center; flex-shrink:0; }
 
-        /* Form controls */
         .form-control, .form-select {
             border-radius:10px; border:1px solid var(--border);
             padding:.55rem .85rem; font-size:.83rem; font-family:inherit;
@@ -470,7 +444,6 @@ $sitesByCategory = [
         .btn-primary:hover { background:var(--accent-dark); }
         .btn-secondary { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.55rem 1.25rem; font-size:.83rem; font-weight:700; color:var(--slate); cursor:pointer; }
 
-        /* View Modal landscape */
         .view-body { display:flex; gap:1.25rem; }
         .view-left {
             width:200px; flex-shrink:0; background:linear-gradient(160deg,var(--navy),var(--navy-mid));
@@ -489,7 +462,6 @@ $sitesByCategory = [
         .pwd-input-grp button { border-radius:9px; border:1px solid var(--border); background:var(--white); padding:6px 10px; cursor:pointer; transition:all .15s; }
         .pwd-input-grp button:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 
-        /* Toast */
         .toast-msg {
             position:fixed; top:20px; right:20px; padding:10px 20px; border-radius:12px;
             color:#fff; font-size:.83rem; font-weight:600; z-index:9999;
@@ -497,11 +469,7 @@ $sitesByCategory = [
         }
         @keyframes slideInToast { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
 
-        /* ═══════════════════════════════════════
-           RESPONSIVE
-        ═══════════════════════════════════════ */
         @media (max-width:1200px) { .cred-grid { grid-template-columns:repeat(2,1fr); } }
-
         @media (max-width:768px) {
             .sidebar { transform:translateX(-100%); }
             .sidebar.open { transform:translateX(0); }
@@ -515,7 +483,6 @@ $sitesByCategory = [
             .view-left { width:100%; }
             .topbar { padding:.75rem 1rem; }
         }
-
         @media (max-width:480px) {
             .btn-add span { display:none; }
             .filter-bar .col-md-4 { display:none; }
@@ -524,10 +491,8 @@ $sitesByCategory = [
 </head>
 <body>
 
-<!-- Overlay for mobile sidebar -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
@@ -536,32 +501,16 @@ $sitesByCategory = [
             <span>Enterprise Password Manager</span>
         </div>
     </div>
-
     <nav class="sidebar-nav">
         <div class="nav-section-label">Main</div>
-        <a href="dashboard.php" class="nav-item">
-            <i class="fas fa-gauge-high"></i> Dashboard
-        </a>
-        <a href="vault.php" class="nav-item active">
-            <i class="fas fa-lock"></i> Password Vault
-            <span class="nav-badge"><?php echo count($passwords); ?></span>
-        </a>
-
+        <a href="dashboard.php" class="nav-item"><i class="fas fa-gauge-high"></i> Dashboard</a>
+        <a href="vault.php" class="nav-item active"><i class="fas fa-lock"></i> Password Vault <span class="nav-badge"><?php echo count($passwords); ?></span></a>
         <div class="nav-section-label" style="margin-top:.5rem;">Manage</div>
-        <a href="settings.php" class="nav-item">
-            <i class="fas fa-gear"></i> Settings
-        </a>
-        <a href="logs.php" class="nav-item">
-            <i class="fas fa-clock-rotate-left"></i> Activity Logs
-        </a>
-
+        <a href="settings.php" class="nav-item"><i class="fas fa-gear"></i> Settings</a>
+        <a href="logs.php" class="nav-item"><i class="fas fa-clock-rotate-left"></i> Activity Logs</a>
         <hr class="sidebar-divider">
-
-        <a href="logout.php" class="nav-item" style="color:rgba(239,68,68,.7);">
-            <i class="fas fa-right-from-bracket"></i> Logout
-        </a>
+        <a href="logout.php" class="nav-item" style="color:rgba(239,68,68,.7);"><i class="fas fa-right-from-bracket"></i> Logout</a>
     </nav>
-
     <div class="sidebar-footer">
         <div class="sidebar-user">
             <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['username'] ?? 'U', 0, 2)); ?></div>
@@ -573,33 +522,22 @@ $sitesByCategory = [
     </div>
 </aside>
 
-<!-- ═══ MAIN ═══ -->
 <div class="main-wrap" id="mainWrap">
-
-    <!-- Top Bar -->
     <div class="topbar">
         <div class="topbar-left">
-            <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Open menu">
-                <i class="fas fa-bars"></i>
-            </button>
+            <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             <div class="page-title">
                 <h1><i class="fas fa-vault" style="color:var(--accent);margin-right:8px;font-size:1.1rem;"></i>Password Vault</h1>
                 <p>Click any credential card to view full details</p>
             </div>
         </div>
-        <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addModal">
-            <i class="fas fa-plus"></i> <span>Add Credential</span>
-        </button>
+        <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fas fa-plus"></i> <span>Add Credential</span></button>
     </div>
 
-    <!-- Filter Bar -->
     <div class="filter-bar">
         <div class="row g-2">
             <div class="col-12 col-md-5">
-                <div class="search-wrap">
-                    <i class="fas fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Search credentials…">
-                </div>
+                <div class="search-wrap"><i class="fas fa-magnifying-glass"></i><input type="text" id="searchInput" placeholder="Search credentials…"></div>
             </div>
             <div class="col-6 col-md-3">
                 <select id="categoryFilter" class="form-select">
@@ -616,22 +554,16 @@ $sitesByCategory = [
         </div>
     </div>
 
-    <!-- Vault Card -->
     <div class="vault-card">
-        <div class="vault-header">
-            <h3><i class="fas fa-key"></i>Saved Credentials</h3>
-        </div>
+        <div class="vault-header"><h3><i class="fas fa-key"></i>Saved Credentials</h3></div>
         <div class="vault-scroll">
             <div class="cred-grid" id="vaultContainer">
-
                 <?php foreach($passwords as $item):
                     $decryptedPwd = Encryption::decrypt($item['encrypted_password'], $_SESSION['master_key']);
                     $strength = checkPasswordStrength($decryptedPwd);
                     $sc = $strength === 'Strong' ? ['#10B981','#D1FAE5'] : ($strength === 'Medium' ? ['#F59E0B','#FEF3C7'] : ['#EF4444','#FEE2E2']);
-
                     [$iconClass, $iconColor] = getSiteData($item['name']);
-                    $iconBg = $iconColor . '1A'; // 10% opacity hex
-
+                    $iconBg = $iconColor . '1A';
                     $catMeta = [
                         'Work'     => ['fa-briefcase',   '#3B82F6'],
                         'Personal' => ['fa-user',         '#8B5CF6'],
@@ -640,111 +572,42 @@ $sitesByCategory = [
                     ];
                     [$catIcon, $catAccent] = $catMeta[$item['category']] ?? ['fa-folder','#64748B'];
                 ?>
-                <div class="cred-card"
-                     data-id="<?php echo $item['id']; ?>"
-                     data-name="<?php echo htmlspecialchars($item['name']); ?>"
-                     data-url="<?php echo htmlspecialchars($item['url']); ?>"
-                     data-username="<?php echo htmlspecialchars($item['username']); ?>"
-                     data-password="<?php echo htmlspecialchars($decryptedPwd); ?>"
-                     data-notes="<?php echo htmlspecialchars($item['notes']); ?>"
-                     data-category="<?php echo $item['category']; ?>"
-                     data-strength="<?php echo $strength; ?>"
-                     data-icon="<?php echo $iconClass; ?>"
-                     data-icon-color="<?php echo $iconColor; ?>">
-
-                    <!-- Left accent bar -->
+                <div class="cred-card" data-id="<?php echo $item['id']; ?>">
                     <div class="accent-bar" style="background:<?php echo $iconColor; ?>;"></div>
-
                     <div class="card-top">
-                        <div class="brand-icon" style="background:<?php echo $iconBg; ?>;">
-                            <i class="<?php echo $iconClass; ?>" style="color:<?php echo $iconColor; ?>;"></i>
-                        </div>
-                        <div class="cat-pill">
-                            <i class="fas <?php echo $catIcon; ?>" style="color:<?php echo $catAccent; ?>;"></i>
-                            <?php echo $item['category']; ?>
-                        </div>
+                        <div class="brand-icon" style="background:<?php echo $iconBg; ?>;"><i class="<?php echo $iconClass; ?>" style="color:<?php echo $iconColor; ?>;"></i></div>
+                        <div class="cat-pill"><i class="fas <?php echo $catIcon; ?>" style="color:<?php echo $catAccent; ?>;"></i><?php echo $item['category']; ?></div>
                     </div>
-
                     <div class="cred-name"><?php echo sanitizeOutput($item['name']); ?></div>
-
                     <?php if($item['url']): ?>
-                    <div class="cred-url">
-                        <i class="fas fa-link"></i>
-                        <span><?php echo sanitizeOutput($item['url']); ?></span>
-                    </div>
+                    <div class="cred-url"><i class="fas fa-link"></i><span><?php echo sanitizeOutput($item['url']); ?></span></div>
                     <?php endif; ?>
-
-                    <div class="info-chip">
-                        <div class="chip-label"><i class="fas fa-user" style="margin-right:3px;color:var(--accent);"></i>Username</div>
-                        <div class="chip-value"><?php echo sanitizeOutput($item['username']); ?></div>
-                    </div>
-
-                    <div class="pwd-chip">
-                        <div>
-                            <span class="pwd-mask">••••••••••••</span>
-                            <span class="pwd-clear"><?php echo sanitizeOutput($decryptedPwd); ?></span>
-                        </div>
-                        <span class="strength-tag" style="background:<?php echo $sc[1]; ?>;color:<?php echo $sc[0]; ?>;">
-                            <i class="fas <?php echo $strength==='Strong'?'fa-circle-check':($strength==='Medium'?'fa-circle-half-stroke':'fa-circle-exclamation'); ?>"></i>
-                            <?php echo $strength; ?>
-                        </span>
-                    </div>
-
+                    <div class="info-chip"><div class="chip-label"><i class="fas fa-user" style="margin-right:3px;color:var(--accent);"></i>Username</div><div class="chip-value"><?php echo sanitizeOutput($item['username']); ?></div></div>
+                    <div class="pwd-chip"><div><span class="pwd-mask">••••••••••••</span><span class="pwd-clear"><?php echo sanitizeOutput($decryptedPwd); ?></span></div><span class="strength-tag" style="background:<?php echo $sc[1]; ?>;color:<?php echo $sc[0]; ?>;"><i class="fas <?php echo $strength==='Strong'?'fa-circle-check':($strength==='Medium'?'fa-circle-half-stroke':'fa-circle-exclamation'); ?>"></i><?php echo $strength; ?></span></div>
                     <div class="card-actions">
-                        <button class="act-btn act-copy" onclick="event.stopPropagation()" title="Copy password">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <button class="act-btn act-show" onclick="event.stopPropagation();togglePwd(this)" title="Show/hide password">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="act-btn act-edit"
-                                onclick="event.stopPropagation()"
-                                data-id="<?php echo $item['id']; ?>"
-                                data-name="<?php echo htmlspecialchars($item['name']); ?>"
-                                data-url="<?php echo htmlspecialchars($item['url']); ?>"
-                                data-username="<?php echo htmlspecialchars($item['username']); ?>"
-                                data-password="<?php echo htmlspecialchars($decryptedPwd); ?>"
-                                data-notes="<?php echo htmlspecialchars($item['notes']); ?>"
-                                data-category="<?php echo $item['category']; ?>"
-                                data-icon="<?php echo $iconClass; ?>"
-                                data-bs-toggle="modal" data-bs-target="#editModal">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                        <button class="act-btn act-del delete-btn" onclick="event.stopPropagation()" data-id="<?php echo $item['id']; ?>" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <button class="act-btn act-view" data-action="view" data-id="<?php echo $item['id']; ?>"><i class="fas fa-eye"></i> View</button>
+                        <button class="act-btn act-copy" data-action="copy" data-id="<?php echo $item['id']; ?>"><i class="fas fa-copy"></i> Copy</button>
+                        <button class="act-btn act-edit" data-action="edit" data-id="<?php echo $item['id']; ?>"><i class="fas fa-pen"></i> Edit</button>
+                        <button class="act-btn act-del" data-action="delete" data-id="<?php echo $item['id']; ?>"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 <?php endforeach; ?>
-
                 <?php if(empty($passwords)): ?>
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fas fa-vault"></i></div>
-                    <h4>Your vault is empty</h4>
-                    <p>Click <strong>Add Credential</strong> above to store your first password securely.</p>
-                </div>
+                <div class="empty-state"><div class="empty-icon"><i class="fas fa-vault"></i></div><h4>Your vault is empty</h4><p>Click <strong>Add Credential</strong> above to store your first password securely.</p></div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
-            </div><!-- /cred-grid -->
-        </div><!-- /vault-scroll -->
-    </div><!-- /vault-card -->
-
-</div><!-- /main-wrap -->
-
-<!-- ════════════════════════
-     ADD MODAL
-════════════════════════ -->
+<!-- Add Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Add New Credential</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="modal-header"><h5 class="modal-title"><i class="fas fa-plus-circle"></i> Add New Credential</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <form id="addForm">
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-
                     <label class="label-sm"><i class="fas fa-tag"></i>Step 1 — Select Category</label>
                     <div class="cat-picker" id="addCatPicker">
                         <div class="cat-opt" data-cat="Work"><i class="fas fa-briefcase"></i>Work</div>
@@ -753,57 +616,24 @@ $sitesByCategory = [
                         <div class="cat-opt" data-cat="Social"><i class="fas fa-hashtag"></i>Social</div>
                     </div>
                     <input type="hidden" name="category" id="addSelCat" required>
-
-                    <div id="addSiteWrap" style="display:none;margin-bottom:1rem;">
-                        <label class="label-sm"><i class="fas fa-globe"></i>Step 2 — Select Site / App</label>
-                        <div class="site-picker" id="addSitePicker"></div>
-                        <input type="hidden" name="name" id="addSelSite" required>
-                        <input type="hidden" name="url" id="addSelUrl">
-                    </div>
-
-                    <div id="addCredsWrap" style="display:none;">
-                        <div class="mb-3">
-                            <label class="label-sm"><i class="fas fa-user"></i>Username / Email</label>
-                            <input type="text" name="username" id="addUsername" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="label-sm"><i class="fas fa-lock"></i>Password</label>
-                            <div class="input-group">
-                                <input type="password" name="password" id="addPwd" class="form-control" required>
-                                <button type="button" class="btn btn-outline-secondary" id="addGenPwd"><i class="fas fa-wand-magic-sparkles"></i></button>
-                            </div>
-                            <div id="addStrength" class="mt-1" style="font-size:.75rem;"></div>
-                        </div>
-                        <div class="mb-1">
-                            <label class="label-sm"><i class="fas fa-note-sticky"></i>Notes</label>
-                            <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes…"></textarea>
-                        </div>
-                    </div>
+                    <div id="addSiteWrap" style="display:none;margin-bottom:1rem;"><label class="label-sm"><i class="fas fa-globe"></i>Step 2 — Select Site / App</label><div class="site-picker" id="addSitePicker"></div><input type="hidden" name="name" id="addSelSite" required><input type="hidden" name="url" id="addSelUrl"></div>
+                    <div id="addCredsWrap" style="display:none;"><div class="mb-3"><label class="label-sm"><i class="fas fa-user"></i>Username / Email</label><input type="text" name="username" id="addUsername" class="form-control" required></div><div class="mb-3"><label class="label-sm"><i class="fas fa-lock"></i>Password</label><div class="input-group"><input type="password" name="password" id="addPwd" class="form-control" required><button type="button" class="btn btn-outline-secondary" id="addGenPwd"><i class="fas fa-wand-magic-sparkles"></i></button></div><div id="addStrength" class="mt-1" style="font-size:.75rem;"></div></div><div class="mb-1"><label class="label-sm"><i class="fas fa-note-sticky"></i>Notes</label><textarea name="notes" class="form-control" rows="2" placeholder="Optional notes…"></textarea></div></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary" id="addSubmitBtn" disabled>Save Credential</button>
-                </div>
+                <div class="modal-footer"><button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-primary" id="addSubmitBtn" disabled>Save Credential</button></div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ════════════════════════
-     EDIT MODAL
-════════════════════════ -->
+<!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-pen-to-square"></i> Edit Credential</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="modal-header"><h5 class="modal-title"><i class="fas fa-pen-to-square"></i> Edit Credential</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <form id="editForm">
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                     <input type="hidden" name="id" id="editId">
-
                     <label class="label-sm"><i class="fas fa-tag"></i>Step 1 — Select Category</label>
                     <div class="cat-picker" id="editCatPicker">
                         <div class="cat-opt" data-cat="Work"><i class="fas fa-briefcase"></i>Work</div>
@@ -812,69 +642,59 @@ $sitesByCategory = [
                         <div class="cat-opt" data-cat="Social"><i class="fas fa-hashtag"></i>Social</div>
                     </div>
                     <input type="hidden" name="category" id="editSelCat" required>
-
-                    <div id="editSiteWrap" style="display:none;margin-bottom:1rem;">
-                        <label class="label-sm"><i class="fas fa-globe"></i>Step 2 — Select Site / App</label>
-                        <div class="site-picker" id="editSitePicker"></div>
-                        <input type="hidden" name="name" id="editSelSite" required>
-                        <input type="hidden" name="url" id="editSelUrl">
-                    </div>
-
-                    <div id="editCredsWrap" style="display:none;">
-                        <div class="mb-3">
-                            <label class="label-sm"><i class="fas fa-user"></i>Username / Email</label>
-                            <input type="text" name="username" id="editUsername" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="label-sm"><i class="fas fa-lock"></i>Password</label>
-                            <div class="input-group">
-                                <input type="password" name="password" id="editPwd" class="form-control" required>
-                                <button type="button" class="btn btn-outline-secondary" id="editGenPwd"><i class="fas fa-wand-magic-sparkles"></i></button>
-                            </div>
-                            <div id="editStrength" class="mt-1" style="font-size:.75rem;"></div>
-                        </div>
-                        <div class="mb-1">
-                            <label class="label-sm"><i class="fas fa-note-sticky"></i>Notes</label>
-                            <textarea name="notes" id="editNotes" class="form-control" rows="2"></textarea>
-                        </div>
-                    </div>
+                    <div id="editSiteWrap" style="display:none;margin-bottom:1rem;"><label class="label-sm"><i class="fas fa-globe"></i>Step 2 — Select Site / App</label><div class="site-picker" id="editSitePicker"></div><input type="hidden" name="name" id="editSelSite" required><input type="hidden" name="url" id="editSelUrl"></div>
+                    <div id="editCredsWrap" style="display:none;"><div class="mb-3"><label class="label-sm"><i class="fas fa-user"></i>Username / Email</label><input type="text" name="username" id="editUsername" class="form-control" required></div><div class="mb-3"><label class="label-sm"><i class="fas fa-lock"></i>Password</label><div class="input-group"><input type="password" name="password" id="editPwd" class="form-control" required><button type="button" class="btn btn-outline-secondary" id="editGenPwd"><i class="fas fa-wand-magic-sparkles"></i></button></div><div id="editStrength" class="mt-1" style="font-size:.75rem;"></div></div><div class="mb-1"><label class="label-sm"><i class="fas fa-note-sticky"></i>Notes</label><textarea name="notes" id="editNotes" class="form-control" rows="2"></textarea></div></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-primary" id="editSubmitBtn" disabled>Update Credential</button>
-                </div>
+                <div class="modal-footer"><button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-primary" id="editSubmitBtn" disabled>Update Credential</button></div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ════════════════════════
-     VIEW MODAL
-════════════════════════ -->
+<!-- View Modal -->
 <div class="modal fade" id="viewModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" style="max-width:720px;">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-circle-info"></i> Credential Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="modal-header"><h5 class="modal-title"><i class="fas fa-circle-info"></i> Credential Details</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <div class="modal-body" id="viewBody"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+            <div class="modal-footer"><button type="button" class="btn-secondary" data-bs-dismiss="modal">Close</button></div>
         </div>
     </div>
 </div>
 
 <div id="toastMsg" class="toast-msg"></div>
 
-<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const sitesByCat = <?php echo json_encode($sitesByCategory); ?>;
 
-/* ── SIDEBAR ── */
+// CREDENTIALS DATA stored server-side for each ID
+const CREDS = <?php
+    $stmt2 = $pdo->prepare("SELECT * FROM passwords WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt2->execute([$_SESSION['user_id']]);
+    $allCreds = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    $credData = [];
+    foreach ($allCreds as $row) {
+        $decPwd = Encryption::decrypt($row['encrypted_password'], $_SESSION['master_key']);
+        [$ic, $icCol] = getSiteData($row['name']);
+        $str = checkPasswordStrength($decPwd);
+        $credData[$row['id']] = [
+            'id' => (int)$row['id'],
+            'name' => $row['name'],
+            'url' => $row['url'] ?? '',
+            'username' => $row['username'],
+            'password' => $decPwd,
+            'notes' => $row['notes'] ?? '',
+            'category' => $row['category'],
+            'strength' => $str,
+            'icon' => $ic,
+            'iconColor' => $icCol,
+        ];
+    }
+    echo json_encode($credData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+?>;
+
 function openSidebar() {
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebarOverlay').classList.add('open');
@@ -885,73 +705,136 @@ function closeSidebar() {
     document.getElementById('sidebarOverlay').classList.remove('open');
     document.body.style.overflow = '';
 }
-// Close on swipe left
-let touchStartX = 0;
-document.getElementById('sidebar').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
-document.getElementById('sidebar').addEventListener('touchend', e => {
-    if (touchStartX - e.changedTouches[0].screenX > 60) closeSidebar();
-}, {passive:true});
-
-/* ── TOAST ── */
 function toast(msg, ok=true) {
     const t = $('#toastMsg');
     t.css('background', ok ? '#10B981' : '#EF4444').text(msg).fadeIn(250);
     setTimeout(() => t.fadeOut(300), 2800);
 }
+function escHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 
-/* ── PASSWORD SHOW/HIDE (card) ── */
-function togglePwd(btn) {
-    const card = $(btn).closest('.cred-card');
-    const mask = card.find('.pwd-mask');
-    const clear = card.find('.pwd-clear');
-    const icon = $(btn).find('i');
-    if (mask.is(':visible')) {
-        mask.hide(); clear.show();
-        icon.removeClass('fa-eye').addClass('fa-eye-slash');
-    } else {
-        mask.show(); clear.hide();
-        icon.removeClass('fa-eye-slash').addClass('fa-eye');
-    }
+// View credential by ID
+function viewCredential(id) {
+    const c = CREDS[id];
+    if (!c) return;
+    const col = c.iconColor || '#64748B';
+    const sc = c.strength === 'Strong' ? ['#10B981','#D1FAE5'] : (c.strength === 'Medium' ? ['#F59E0B','#FEF3C7'] : ['#EF4444','#FEE2E2']);
+    const catIconMap = {Work:'fa-briefcase', Personal:'fa-user', Finance:'fa-chart-line', Social:'fa-hashtag'};
+    const catIcon = catIconMap[c.category] || 'fa-folder';
+    $('#viewBody').html(`
+        <div class="view-body"><div class="view-left"><div class="view-icon" style="background:${col}22;"><i class="${c.icon}" style="color:${col};font-size:2rem;"></i></div><div class="view-site-name">${escHtml(c.name)}</div><div class="view-cat"><i class="fas ${catIcon}"></i> ${escHtml(c.category)}</div><div style="margin-top:.85rem;"><span style="background:${sc[1]};color:${sc[0]};font-size:.68rem;font-weight:700;padding:4px 12px;border-radius:20px;">${c.strength}</span></div></div><div class="view-right"><div class="view-row"><div class="view-lbl"><i class="fas fa-link" style="color:var(--accent);margin-right:4px;"></i>URL</div><div class="view-val">${c.url ? `<a href="${escHtml(c.url)}" target="_blank" style="color:var(--accent);">${escHtml(c.url)}</a>` : '<span style="color:var(--text-muted);">Not provided</span>'}</div></div><div class="view-row"><div class="view-lbl"><i class="fas fa-user" style="color:var(--accent);margin-right:4px;"></i>Username</div><div class="view-val">${escHtml(c.username)}</div></div><div class="view-row"><div class="view-lbl"><i class="fas fa-lock" style="color:var(--accent);margin-right:4px;"></i>Password</div><div class="view-val"><div class="pwd-input-grp"><input type="password" id="vpwd" value="" readonly style="background:#F8FAFC;"><button type="button" onclick="var i=document.getElementById('vpwd');i.type=i.type==='password'?'text':'password';"><i class="fas fa-eye"></i></button><button type="button" id="vpwd-copy-btn"><i class="fas fa-copy"></i></button></div></div></div><div class="view-row"><div class="view-lbl"><i class="fas fa-note-sticky" style="color:var(--accent);margin-right:4px;"></i>Notes</div><div class="view-val">${escHtml(c.notes) || 'No notes provided'}</div></div></div></div>
+    `);
+    const pwdField = document.getElementById('vpwd');
+    if (pwdField) pwdField.value = c.password;
+    const copyBtn = document.getElementById('vpwd-copy-btn');
+    if (copyBtn) copyBtn.onclick = function() { navigator.clipboard.writeText(c.password).then(() => toast('Copied!')); };
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('viewModal')).show();
 }
 
-/* ── STRENGTH CHECK ── */
-function strength(pwd) {
-    let s=0;
-    if(pwd.length>=8)s++; if(pwd.length>=12)s++;
-    if(/[A-Z]/.test(pwd))s++; if(/[a-z]/.test(pwd))s++;
-    if(/\d/.test(pwd))s++; if(/[^A-Za-z0-9]/.test(pwd))s++;
-    return s<=2?['Weak','#EF4444']:s<=4?['Medium','#F59E0B']:['Strong','#10B981'];
+function copyPassword(id) {
+    const c = CREDS[id];
+    if (c) navigator.clipboard.writeText(c.password).then(() => toast('Password copied!'));
+}
+
+function editCredential(id) {
+    const c = CREDS[id];
+    if (!c) return;
+    $('#editId').val(c.id);
+    $('#editSelCat').val(c.category);
+    $('#editSelSite').val(c.name);
+    $('#editSelUrl').val(c.url || '');
+    $('#editUsername').val(c.username);
+    $('#editPwd').val(c.password);
+    $('#editNotes').val(c.notes || '');
+    const [lbl, col] = strengthCheck(c.password);
+    $('#editStrength').html(`Strength: <span style="color:${col};font-weight:700;">${lbl}</span>`);
+    $('#editCatPicker .cat-opt').removeClass('selected').each(function() { if ($(this).data('cat') === c.category) $(this).addClass('selected'); });
+    $('#editSitePicker').html(buildSitePicker('editSitePicker', c.category, c.name));
+    $('#editSiteWrap').show();
+    $('#editCredsWrap').show();
+    $('#editSubmitBtn').prop('disabled', false);
+    bindSiteOpts('#editSitePicker', '#editSelSite', '#editSelUrl', '#editCredsWrap', '#editSubmitBtn');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('editModal')).show();
+}
+
+function deleteCredential(id) {
+    const c = CREDS[id];
+    if (!c) return;
+    if (!confirm('Permanently delete "' + c.name + '"?')) return;
+    $.post('ajax_delete.php', { id: c.id }, 'json')
+        .done(r => { if (r.success) { toast('Deleted!'); setTimeout(() => location.reload(), 900); } else toast(r.message || 'Delete failed', false); })
+        .fail(() => toast('Delete failed', false));
+}
+
+// Helper functions
+function strengthCheck(pwd) {
+    let s = 0;
+    if (pwd.length >= 8) s++;
+    if (pwd.length >= 12) s++;
+    if (/[A-Z]/.test(pwd)) s++;
+    if (/[a-z]/.test(pwd)) s++;
+    if (/\d/.test(pwd)) s++;
+    if (/[^A-Za-z0-9]/.test(pwd)) s++;
+    return s <= 2 ? ['Weak', '#EF4444'] : s <= 4 ? ['Medium', '#F59E0B'] : ['Strong', '#10B981'];
 }
 function renderStrength(id, pwd) {
-    const [lbl, col] = strength(pwd);
+    const [lbl, col] = strengthCheck(pwd);
     $(`#${id}`).html(`Strength: <span style="color:${col};font-weight:700;">${lbl}</span>`);
 }
-
-/* ── GENERATE PASSWORD ── */
-function genPwd() {
-    const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    return Array.from({length:16},()=>c[Math.floor(Math.random()*c.length)]).join('');
+function genPassword() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    return Array.from({length:16}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
-
-$('#addPwd, #editPwd').on('input', function() {
-    renderStrength(this.id==='addPwd'?'addStrength':'editStrength', this.value);
-});
-$('#addGenPwd').click(()=>{ const p=genPwd(); $('#addPwd').val(p); renderStrength('addStrength',p); });
-$('#editGenPwd').click(()=>{ const p=genPwd(); $('#editPwd').val(p); renderStrength('editStrength',p); });
-
-/* ── SITE PICKER BUILDER ── */
 function buildSitePicker(containerId, cat, selectedName) {
     const sites = sitesByCat[cat] || [];
     return sites.map(s => {
         const sel = s.name === selectedName ? 'selected' : '';
-        return `<div class="site-opt ${sel}" data-name="${s.name}" data-url="${s.url}" data-icon="${s.icon}" data-color="${s.color}">
-                  <i class="site-opt-icon ${s.icon}" style="color:${sel?'#fff':s.color};"></i>
-                  <span>${s.name}</span>
-                </div>`;
+        return `<div class="site-opt ${sel}" data-name="${s.name}" data-url="${s.url}" data-icon="${s.icon}" data-color="${s.color}"><i class="site-opt-icon ${s.icon}" style="color:${sel?'#fff':s.color};"></i><span>${s.name}</span></div>`;
     }).join('');
 }
+function bindSiteOpts(picker, siteInput, urlInput, credsWrap, submitBtn) {
+    $(`${picker} .site-opt`).off('click').on('click', function() {
+        $(`${picker} .site-opt`).removeClass('selected').each(function() { $(this).find('.site-opt-icon').css('color', $(this).data('color')); });
+        $(this).addClass('selected').find('.site-opt-icon').css('color','#fff');
+        $(siteInput).val($(this).data('name'));
+        $(urlInput).val($(this).data('url'));
+        $(credsWrap).show();
+        $(submitBtn).prop('disabled', false);
+    });
+}
 
-/* ── ADD MODAL ── */
+// BUTTON EVENT HANDLERS - Using event delegation to ensure clicks work
+$(document).on('click', '.act-view', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = $(this).data('id');
+    if (id) viewCredential(id);
+});
+$(document).on('click', '.act-copy', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = $(this).data('id');
+    if (id) copyPassword(id);
+});
+$(document).on('click', '.act-edit', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = $(this).data('id');
+    if (id) editCredential(id);
+});
+$(document).on('click', '.act-del', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = $(this).data('id');
+    if (id) deleteCredential(id);
+});
+// Card click for view (when clicking anywhere on card except buttons)
+$(document).on('click', '.cred-card', function(e) {
+    if ($(e.target).closest('.act-btn').length) return;
+    const id = $(this).data('id');
+    if (id) viewCredential(id);
+});
+
+// ADD MODAL handlers
 $('#addCatPicker .cat-opt').click(function() {
     $('#addCatPicker .cat-opt').removeClass('selected');
     $(this).addClass('selected');
@@ -963,172 +846,59 @@ $('#addCatPicker .cat-opt').click(function() {
     $('#addSubmitBtn').prop('disabled', true);
     bindSiteOpts('#addSitePicker', '#addSelSite', '#addSelUrl', '#addCredsWrap', '#addSubmitBtn');
 });
-
-function bindSiteOpts(picker, siteInput, urlInput, credsWrap, submitBtn) {
-    $(`${picker} .site-opt`).off('click').on('click', function() {
-        $(`${picker} .site-opt`).removeClass('selected').each(function() {
-            $(this).find('.site-opt-icon').css('color', $(this).data('color'));
-        });
-        $(this).addClass('selected').find('.site-opt-icon').css('color','#fff');
-        $(siteInput).val($(this).data('name'));
-        $(urlInput).val($(this).data('url'));
-        $(credsWrap).show();
-        $(submitBtn).prop('disabled', false);
-    });
-}
-
-/* ── EDIT MODAL ── */
-$('.act-edit').click(function() {
-    const d = this.dataset;
-    $('#editId').val(d.id);
-    $('#editSelCat').val(d.category);
-    $('#editSelSite').val(d.name);
-    $('#editSelUrl').val(d.url);
-    $('#editUsername').val(d.username);
-    $('#editPwd').val(d.password);
-    $('#editNotes').val(d.notes);
-    renderStrength('editStrength', d.password);
-
-    $('#editCatPicker .cat-opt').removeClass('selected').each(function() {
-        if ($(this).data('cat') === d.category) $(this).addClass('selected');
-    });
-
-    $('#editSitePicker').html(buildSitePicker('editSitePicker', d.category, d.name));
-    $('#editSiteWrap').show();
-    $('#editCredsWrap').show();
-    $('#editSubmitBtn').prop('disabled', false);
-    bindSiteOpts('#editSitePicker', '#editSelSite', '#editSelUrl', '#editCredsWrap', '#editSubmitBtn');
-});
-
-$('#editCatPicker .cat-opt').click(function() {
+$('#editCatPicker .cat-opt').on('click', function() {
     $('#editCatPicker .cat-opt').removeClass('selected');
     $(this).addClass('selected');
     const cat = $(this).data('cat');
     $('#editSelCat').val(cat);
     $('#editSitePicker').html(buildSitePicker('editSitePicker', cat, ''));
+    $('#editSelSite').val('');
+    $('#editSelUrl').val('');
     $('#editSiteWrap').show();
     $('#editCredsWrap').hide();
     $('#editSubmitBtn').prop('disabled', true);
     bindSiteOpts('#editSitePicker', '#editSelSite', '#editSelUrl', '#editCredsWrap', '#editSubmitBtn');
 });
+$('#addPwd, #editPwd').on('input', function() { renderStrength(this.id==='addPwd'?'addStrength':'editStrength', this.value); });
+$('#addGenPwd').click(() => { const p = genPassword(); $('#addPwd').val(p); renderStrength('addStrength', p); });
+$('#editGenPwd').click(() => { const p = genPassword(); $('#editPwd').val(p); renderStrength('editStrength', p); });
 
-/* ── VIEW MODAL ── */
-function escHtml(t) {
-    if (!t) return '';
-    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-$('.cred-card').click(function(e) {
-    if ($(e.target).closest('.card-actions').length) return;
-    const d = this.dataset;
-    const ic = d.icon || 'fas fa-key';
-    const col = d.iconColor || '#64748B';
-    const sc = d.strength==='Strong'?['#10B981','#D1FAE5']:d.strength==='Medium'?['#F59E0B','#FEF3C7']:['#EF4444','#FEE2E2'];
-    const catIcon = {Work:'fa-briefcase',Personal:'fa-user',Finance:'fa-chart-line',Social:'fa-hashtag'}[d.category]||'fa-folder';
-
-    $('#viewBody').html(`
-        <div class="view-body">
-          <div class="view-left">
-            <div class="view-icon" style="background:${col}22;">
-              <i class="${ic}" style="color:${col};"></i>
-            </div>
-            <div class="view-site-name">${escHtml(d.name)}</div>
-            <div class="view-cat"><i class="fas ${catIcon}"></i> ${d.category}</div>
-            <div style="margin-top:.85rem;">
-              <span style="background:${sc[1]};color:${sc[0]};font-size:.68rem;font-weight:700;padding:4px 12px;border-radius:20px;">
-                ${d.strength}
-              </span>
-            </div>
-          </div>
-          <div class="view-right">
-            <div class="view-row">
-              <div class="view-lbl"><i class="fas fa-link" style="color:var(--accent);margin-right:4px;"></i>URL</div>
-              <div class="view-val">${d.url ? `<a href="${escHtml(d.url)}" target="_blank" style="color:var(--accent);">${escHtml(d.url)}</a>` : '<span style="color:var(--text-muted);">Not provided</span>'}</div>
-            </div>
-            <div class="view-row">
-              <div class="view-lbl"><i class="fas fa-user" style="color:var(--accent);margin-right:4px;"></i>Username</div>
-              <div class="view-val">${escHtml(d.username)}</div>
-            </div>
-            <div class="view-row">
-              <div class="view-lbl"><i class="fas fa-lock" style="color:var(--accent);margin-right:4px;"></i>Password</div>
-              <div class="view-val">
-                <div class="pwd-input-grp">
-                  <input type="password" id="vpwd" value="${escHtml(d.password)}" readonly>
-                  <button onclick="document.getElementById('vpwd').type=document.getElementById('vpwd').type==='password'?'text':'password';"><i class="fas fa-eye"></i></button>
-                  <button onclick="navigator.clipboard.writeText('${escHtml(d.password)}');"><i class="fas fa-copy"></i></button>
-                </div>
-              </div>
-            </div>
-            <div class="view-row">
-              <div class="view-lbl"><i class="fas fa-note-sticky" style="color:var(--accent);margin-right:4px;"></i>Notes</div>
-              <div class="view-val" style="color:var(--text-muted);">${escHtml(d.notes) || 'No notes provided'}</div>
-            </div>
-          </div>
-        </div>
-    `);
-    $('#viewModal').modal('show');
+// Form submits
+$('#addForm').submit(function(e) {
+    e.preventDefault();
+    $.post('ajax_add.php', $(this).serialize()).done(r => { try { r = typeof r === 'string' ? JSON.parse(r) : r; } catch(e){} if(r.success){ toast('Credential saved!'); setTimeout(()=>location.reload(),900); } else toast(r.message||'Error',false); }).fail(()=>toast('Save failed',false));
+});
+$('#editForm').submit(function(e) {
+    e.preventDefault();
+    $.post('ajax_edit.php', $(this).serialize()).done(r => { try { r = typeof r === 'string' ? JSON.parse(r) : r; } catch(e){} if(r.success){ toast('Updated!'); setTimeout(()=>location.reload(),900); } else toast(r.message||'Error',false); }).fail(()=>toast('Update failed',false));
 });
 
-/* ── COPY BUTTON ── */
-$('.act-copy').click(function() {
-    const pwd = $(this).closest('.cred-card').find('.pwd-clear').text();
-    navigator.clipboard.writeText(pwd).then(() => {
-        const orig = $(this).html();
-        $(this).html('<i class="fas fa-check"></i> Done!');
-        setTimeout(() => $(this).html(orig), 1800);
-        toast('Password copied to clipboard!');
-    });
-});
-
-/* ── DELETE ── */
-$('.delete-btn').click(function() {
-    if (!confirm('Permanently delete this credential?')) return;
-    const id = $(this).data('id');
-    $.post('ajax_delete.php', {id}, 'json')
-     .done(r => { if(r.success){toast('Deleted!');setTimeout(()=>location.reload(),900);}else toast(r.message,false); })
-     .fail(()=>toast('Delete failed',false));
-});
-
-/* ── SEARCH / FILTER ── */
+// Search/filter
 $('#searchInput, #categoryFilter').on('input change', function() {
     const q = $('#searchInput').val().toLowerCase();
     const cat = $('#categoryFilter').val();
     let n = 0;
     $('.cred-card').each(function() {
         const nm = $(this).find('.cred-name').text().toLowerCase();
-        const c  = $(this).data('category');
+        const c = $(this).data('category');
         const show = (!q || nm.includes(q)) && (!cat || c === cat);
         $(this).toggle(show);
         if(show) n++;
     });
     $('#resultCount').text(n);
     $('.no-results-msg').remove();
-    if (n === 0 && $('.cred-card').length) {
-        $('#vaultContainer').append('<div class="empty-state no-results-msg" style="grid-column:1/-1;"><div class="empty-icon"><i class="fas fa-magnifying-glass"></i></div><h4>No matches</h4><p>Try a different search term or category.</p></div>');
-    }
+    if (n === 0 && $('.cred-card').length) $('#vaultContainer').append('<div class="empty-state no-results-msg" style="grid-column:1/-1;"><div class="empty-icon"><i class="fas fa-magnifying-glass"></i></div><h4>No matches</h4><p>Try a different search term or category.</p></div>');
 });
 
-/* ── FORM SUBMIT ── */
-$('#addForm').submit(function(e) {
-    e.preventDefault();
-    $.post('ajax_add.php', $(this).serialize())
-     .done(r => { try{r=typeof r==='string'?JSON.parse(r):r;}catch(e){} if(r.success){toast('Credential saved!');setTimeout(()=>location.reload(),900);}else toast(r.message||'Error',false); })
-     .fail(()=>toast('Save failed',false));
-});
+// Modal reset
+$('#addModal').on('hidden.bs.modal', function() { $('#addCatPicker .cat-opt').removeClass('selected'); $('#addSiteWrap, #addCredsWrap').hide(); $('#addSubmitBtn').prop('disabled', true); $(this).find('form')[0].reset(); $('#addStrength').html(''); });
+$('#editModal').on('hidden.bs.modal', function() { $('#editCatPicker .cat-opt').removeClass('selected'); $('#editSiteWrap, #editCredsWrap').hide(); $('#editSubmitBtn').prop('disabled', true); $('#editStrength').html(''); $(this).find('form')[0].reset(); });
 
-$('#editForm').submit(function(e) {
-    e.preventDefault();
-    $.post('ajax_edit.php', $(this).serialize())
-     .done(r => { try{r=typeof r==='string'?JSON.parse(r):r;}catch(e){} if(r.success){toast('Updated!');setTimeout(()=>location.reload(),900);}else toast(r.message||'Error',false); })
-     .fail(()=>toast('Update failed',false));
-});
-
-/* ── MODAL RESET ── */
-$('#addModal').on('hidden.bs.modal', function() {
-    $('#addCatPicker .cat-opt').removeClass('selected');
-    $('#addSiteWrap, #addCredsWrap').hide();
-    $('#addSubmitBtn').prop('disabled', true);
-    $(this).find('form')[0].reset();
+// Set category data attribute on cards for filtering
+$('.cred-card').each(function() {
+    const card = $(this);
+    const cat = card.find('.cat-pill').text().trim();
+    card.attr('data-category', cat);
 });
 </script>
 </body>
